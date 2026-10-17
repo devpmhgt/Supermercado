@@ -1,0 +1,14 @@
+.pestanas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+.pestanas button {
+  font: inherit; padding: .5rem .9rem; border-radius: 999px; border: 1px solid var(--borde);
+  background: #fff; cursor: pointer; color: var(--texto);
+}
+.pestanas button:hover { border-color: var(--azul); }
+.pestanas button.activa { background: var(--navy); border-color: var(--navy); color: #fff; }
+.descripcion { color: var(--gris); margin: -.4rem 0 1rem; }
+.resumen-fechas {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .75rem;
+  background: var(--azul-claro); border-radius: 8px; padding: .9rem 1rem; margin-bottom: 1rem;
+}
+.resumen-fechas span { display: block; color: var(--gris); font-size: .8rem; }
+.resumen-fechas strong { font-size: 1.15rem; color: var(--navy); }

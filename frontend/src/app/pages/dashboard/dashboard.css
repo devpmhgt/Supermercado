@@ -1,0 +1,40 @@
+/* Tarjetas de indicadores (también usadas en Inventario) */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.kpi {
+  background: #fff; border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra);
+  padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .3rem;
+  text-decoration: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+div.kpi { cursor: default; }
+.kpi:hover { border-color: var(--azul); }
+.kpi span { color: var(--gris); font-size: .82rem; font-weight: 600; }
+.kpi strong { font-size: 1.75rem; color: var(--navy); }
+.kpi small { color: var(--gris); }
+.kpi.destacado { background: var(--navy); border-color: var(--navy); }
+.kpi.destacado span, .kpi.destacado small { color: #b9c8e6; }
+.kpi.destacado strong { color: #fff; }
+.kpi.alerta strong { color: var(--ambar); }
+.kpi.peligro strong { color: var(--rojo); }
+
+/* Gráfica de columnas */
+.columnas { display: flex; align-items: flex-end; gap: .75rem; height: 220px; padding-top: .5rem; }
+.columna { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: .3rem; }
+.columna small { font-size: .7rem; color: var(--gris); white-space: nowrap; }
+.columna span { font-size: .78rem; color: var(--gris); }
+.barra-v { width: 100%; max-width: 48px; min-height: 3px; background: var(--azul); border-radius: 6px 6px 0 0; }
+
+/* Barras horizontales */
+.barra-h { display: grid; grid-template-columns: minmax(90px, 160px) 1fr auto; align-items: center; gap: .6rem; margin-bottom: .55rem; }
+.etiqueta { font-size: .85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pista { background: #eef1f6; border-radius: 6px; height: 12px; overflow: hidden; }
+.pista div { height: 100%; background: var(--azul); border-radius: 6px; }
+.pista div.verde { background: var(--verde); }
+.valor { font-size: .82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Nivel de inventario */
+.nivel { background: #eef1f6; border-radius: 6px; height: 8px; overflow: hidden; }
+.nivel div { height: 100%; max-width: 100%; background: var(--verde); }
+.nivel div.bajo { background: var(--rojo); }
+
+/* Tablas compactas dentro de las tarjetas del dashboard */
+.card table th, .card table td { padding: .5rem .5rem; }

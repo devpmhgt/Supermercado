@@ -1,0 +1,23 @@
+/* Estilos compartidos por "Nueva venta" y "Nueva compra" */
+.movimiento { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; align-items: start; }
+.buscador { position: relative; }
+.resultados {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 10; margin: 4px 0 0; padding: 4px;
+  list-style: none; background: #fff; border: 1px solid var(--borde); border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(20, 30, 60, .12); max-height: 320px; overflow-y: auto;
+}
+.resultados li {
+  display: flex; justify-content: space-between; gap: 1rem; padding: .55rem .7rem;
+  border-radius: 6px; cursor: pointer;
+}
+.resultados li:hover { background: var(--azul-claro); }
+.resultados li.agotado { opacity: .5; }
+td input { width: 90px; text-align: right; padding: .35rem .5rem; }
+.resumen { position: sticky; top: 1rem; display: flex; flex-direction: column; gap: .75rem; }
+.fila { display: flex; justify-content: space-between; }
+.total { font-size: 1.35rem; border-top: 1px solid var(--borde); padding-top: .75rem; }
+
+@media (max-width: 960px) {
+  .movimiento { grid-template-columns: 1fr; }
+  .resumen { position: static; }
+}

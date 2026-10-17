@@ -1,0 +1,107 @@
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Bienvenido, {{ auth.usuario()?.nombre }}. Resumen general del supermercado.</p>
+  </div>
+  <a class="btn btn-primary" routerLink="/ventas/nueva">+ Nueva venta</a>
+</div>
+
+@if (datos(); as d) {
+  <div class="kpis">
+    <a class="kpi" routerLink="/productos"><span>Productos registrados</span><strong>{{ d.indicadores.productos }}</strong></a>
+    <a class="kpi" routerLink="/clientes"><span>Clientes registrados</span><strong>{{ d.indicadores.clientes }}</strong></a>
+    <a class="kpi" routerLink="/ventas"><span>Ventas realizadas</span><strong>{{ d.indicadores.ventas }}</strong></a>
+    <div class="kpi destacado">
+      <span>Ventas del día</span>
+      <strong>{{ d.indicadores.ventas_hoy }}</strong>
+      <small>{{ d.indicadores.total_hoy | quetzales }}</small>
+    </div>
+    <a class="kpi" [class.alerta]="d.indicadores.bajo_inventario > 0" routerLink="/inventario">
+      <span>Productos con bajo inventario</span><strong>{{ d.indicadores.bajo_inventario }}</strong>
+    </a>
+    <a class="kpi" routerLink="/compras"><span>Compras realizadas</span><strong>{{ d.indicadores.compras }}</strong></a>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h2>Ventas por mes</h2>
+      <div class="columnas">
+        @for (m of ventasMes(); track m.etiqueta) {
+          <div class="columna" [title]="m.cantidad + ' ventas'">
+            <small>{{ m.total | quetzales }}</small>
+            <div class="barra-v" [style.height.%]="m.pct"></div>
+            <span>{{ m.etiqueta }}</span>
+          </div>
+        } @empty {
+          <p class="vacio">Sin ventas en los últimos meses</p>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Ventas por categoría</h2>
+      @for (c of ventasCategoria(); track c.categoria) {
+        <div class="barra-h">
+          <span class="etiqueta">{{ c.categoria }}</span>
+          <div class="pista"><div [style.width.%]="c.pct"></div></div>
+          <span class="valor">{{ c.total | quetzales }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="card">
+      <h2>Productos más vendidos</h2>
+      @for (p of masVendidos(); track p.nombre) {
+        <div class="barra-h">
+          <span class="etiqueta">{{ p.nombre }}</span>
+          <div class="pista"><div class="verde" [style.width.%]="p.pct"></div></div>
+          <span class="valor">{{ p.unidades }} u.</span>
+        </div>
+      }
+    </div>
+
+    <div class="card">
+      <h2>Productos con bajo inventario</h2>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Producto</th><th class="num">Existencia</th><th class="num">Mínimo</th><th></th></tr></thead>
+        <tbody>
+          @for (i of d.bajo_inventario; track i.codigo) {
+            <tr>
+              <td>{{ i.producto }}</td>
+              <td class="num">{{ i.existencia }}</td>
+              <td class="num">{{ i.stock_minimo }}</td>
+              <td>
+                <span class="badge" [class.badge-warn]="i.estado_inventario === 'BAJO'"
+                      [class.badge-bad]="i.estado_inventario === 'AGOTADO'">{{ i.estado_inventario }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="vacio">Todo el inventario está en niveles normales</td></tr>
+          }
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Últimas ventas</h2>
+      <div class="table-wrap">
+      <table>
+        <tbody>
+          @for (v of d.ultimas_ventas; track v.id) {
+            <tr>
+              <td><a [routerLink]="['/ventas', v.id]">#{{ v.id }}</a></td>
+              <td>{{ v.cliente }}</td>
+              <td>{{ v.fecha | date: 'dd/MM HH:mm' }}</td>
+              <td class="num">{{ v.total | quetzales }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+} @else {
+  <p class="vacio">Cargando información…</p>
+}

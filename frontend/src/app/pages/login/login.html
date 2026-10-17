@@ -1,0 +1,31 @@
+<div class="pantalla">
+  <form class="caja" [formGroup]="form" (ngSubmit)="ingresar()">
+    <div class="logo">S</div>
+    <h1>SuperMercado</h1>
+    <p class="sub">Ingresa con tu usuario para continuar</p>
+
+    <div class="field">
+      <label for="username">Usuario</label>
+      <input id="username" formControlName="username" autocomplete="username" autofocus />
+      @if (form.controls.username.touched && form.controls.username.invalid) {
+        <span class="error-text">El usuario es obligatorio</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="error-text">La contraseña es obligatoria</span>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="alerta">{{ error() }}</div>
+    }
+
+    <button class="btn btn-primary" type="submit" [disabled]="cargando()">
+      {{ cargando() ? 'Verificando…' : 'Iniciar sesión' }}
+    </button>
+  </form>
+</div>

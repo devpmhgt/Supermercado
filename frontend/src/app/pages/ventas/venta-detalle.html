@@ -1,0 +1,51 @@
+@if (venta(); as v) {
+  <div class="page-header">
+    <div>
+      <h1>Venta #{{ v.id }}</h1>
+      <p>{{ v.fecha | date: 'dd/MM/yyyy HH:mm' }} · registrada por {{ v.usuario }}</p>
+    </div>
+    <div class="no-print" style="display: flex; gap: .5rem">
+      <a class="btn" routerLink="/ventas">← Ventas</a>
+      <button class="btn" (click)="imprimir()">Imprimir</button>
+      @if (auth.esAdmin() && v.estado === 'COMPLETADA') {
+        <button class="btn btn-danger" (click)="anular()">Anular venta</button>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toolbar" style="justify-content: space-between">
+      <div>
+        <strong>Cliente:</strong> {{ v.cliente }}<br />
+        <strong>NIT:</strong> {{ v.nit }}
+      </div>
+      <span class="badge" [class.badge-ok]="v.estado === 'COMPLETADA'" [class.badge-bad]="v.estado === 'ANULADA'">
+        {{ v.estado }}
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Código</th><th>Producto</th><th class="num">Cantidad</th><th class="num">Precio</th><th class="num">Subtotal</th></tr>
+        </thead>
+        <tbody>
+          @for (d of v.detalles; track d.id) {
+            <tr>
+              <td>{{ d.codigo }}</td>
+              <td>{{ d.producto }}</td>
+              <td class="num">{{ d.cantidad }}</td>
+              <td class="num">{{ d.precio | quetzales }}</td>
+              <td class="num">{{ d.subtotal | quetzales }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr><td colspan="4">Total</td><td class="num">{{ v.total | quetzales }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+} @else {
+  <p class="vacio">Cargando venta…</p>
+}

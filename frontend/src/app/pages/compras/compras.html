@@ -1,0 +1,79 @@
+<div class="page-header">
+  <div>
+    <h1>Compras</h1>
+    <p>Compras de mercadería realizadas a proveedores</p>
+  </div>
+  <a class="btn btn-primary" routerLink="/compras/nueva">+ Nueva compra</a>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field">
+      <label>Desde</label>
+      <input type="date" [(ngModel)]="desde" />
+    </div>
+    <div class="field">
+      <label>Hasta</label>
+      <input type="date" [(ngModel)]="hasta" />
+    </div>
+    <div class="field grow">
+      <label>Proveedor</label>
+      <select [(ngModel)]="proveedorId">
+        <option value="">Todos</option>
+        @for (p of proveedores(); track p.id) {
+          <option [value]="p.id">{{ p.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="estado">
+        <option value="">Todos</option>
+        <option value="REGISTRADA">Registrada</option>
+        <option value="ANULADA">Anulada</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" (click)="cargar()">Filtrar</button>
+    <button class="btn" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th><th>Fecha</th><th>Proveedor</th><th>Usuario</th>
+          <th class="num">Productos</th><th class="num">Total</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of compras(); track c.id) {
+          <tr [class.inactivo]="c.estado === 'ANULADA'">
+            <td><strong>#{{ c.id }}</strong></td>
+            <td>{{ c.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ c.proveedor }}</td>
+            <td>{{ c.usuario }}</td>
+            <td class="num">{{ c.productos }}</td>
+            <td class="num">{{ c.total | quetzales }}</td>
+            <td>
+              <span class="badge" [class.badge-ok]="c.estado === 'REGISTRADA'" [class.badge-bad]="c.estado === 'ANULADA'">
+                {{ c.estado }}
+              </span>
+            </td>
+            <td class="acciones"><a class="btn btn-sm" [routerLink]="['/compras', c.id]">Ver detalle</a></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8" class="vacio">{{ cargando() ? 'Cargando…' : 'No hay compras para los filtros seleccionados' }}</td></tr>
+        }
+      </tbody>
+      @if (compras().length) {
+        <tfoot>
+          <tr>
+            <td colspan="5">{{ compras().length }} compras (total de registradas)</td>
+            <td class="num">{{ totalListado() | quetzales }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      }
+    </table>
+  </div>
+</div>

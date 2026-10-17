@@ -1,0 +1,82 @@
+<div class="page-header">
+  <div>
+    <h1>Nueva venta</h1>
+    <p>Selecciona el cliente y agrega los productos</p>
+  </div>
+  <a class="btn" routerLink="/ventas">← Volver</a>
+</div>
+
+<div class="movimiento">
+  <div class="card">
+    <div class="field" style="margin-bottom: 1rem">
+      <label>Cliente *</label>
+      <select [ngModel]="clienteId()" (ngModelChange)="clienteId.set($event)">
+        <option [ngValue]="null" disabled>Seleccione un cliente…</option>
+        @for (c of clientes(); track c.id) {
+          <option [ngValue]="c.id">{{ c.nombres }} {{ c.apellidos }} — NIT {{ c.nit }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field buscador">
+      <label>Agregar producto</label>
+      <input placeholder="Escribe el código o nombre del producto…"
+             [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+      @if (resultados().length) {
+        <ul class="resultados">
+          @for (p of resultados(); track p.id) {
+            <li (click)="agregar(p)" [class.agotado]="p.existencia === 0">
+              <span><strong>{{ p.codigo }}</strong> · {{ p.nombre }}</span>
+              <span>{{ p.precio_venta | quetzales }} · <small>Exist.: {{ p.existencia }}</small></span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="table-wrap" style="margin-top: 1rem">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th><th class="num">Disponible</th><th class="num" style="width: 110px">Cantidad</th>
+            <th class="num">Precio</th><th class="num">Subtotal</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of lineas(); track l.producto.id) {
+            <tr>
+              <td>{{ l.producto.nombre }}</td>
+              <td class="num">{{ l.producto.existencia }}</td>
+              <td class="num">
+                <input type="number" min="1" [max]="l.producto.existencia" [ngModel]="l.cantidad"
+                       (ngModelChange)="cambiarCantidad(l.producto.id, $event)" />
+                @if (l.cantidad > l.producto.existencia) {
+                  <span class="error-text">Máx. {{ l.producto.existencia }}</span>
+                }
+              </td>
+              <td class="num">{{ l.producto.precio_venta | quetzales }}</td>
+              <td class="num">{{ l.cantidad * l.producto.precio_venta | quetzales }}</td>
+              <td class="acciones"><button class="btn btn-sm btn-danger" (click)="quitar(l.producto.id)">✕</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="vacio">Aún no hay productos en la venta</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card resumen">
+    <h2>Resumen</h2>
+    <div class="fila"><span>Productos</span><strong>{{ lineas().length }}</strong></div>
+    <div class="fila total"><span>Total</span><strong>{{ total() | quetzales }}</strong></div>
+    @if (lineasInvalidas().length) {
+      <p class="error-text">Hay cantidades que superan el inventario disponible.</p>
+    }
+    <button class="btn btn-primary" style="width: 100%"
+            [disabled]="guardando() || !clienteId() || !lineas().length || lineasInvalidas().length"
+            (click)="registrar()">
+      {{ guardando() ? 'Registrando…' : 'Registrar venta' }}
+    </button>
+  </div>
+</div>

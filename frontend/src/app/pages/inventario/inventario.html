@@ -1,0 +1,79 @@
+<div class="page-header">
+  <div>
+    <h1>Inventario</h1>
+    <p>Existencias actuales. Se actualizan automáticamente con cada compra (+) y venta (−).</p>
+  </div>
+</div>
+
+@if (resumen(); as r) {
+  <div class="kpis">
+    <button class="kpi" (click)="filtrarEstado('')">
+      <span>Productos activos</span><strong>{{ r.productos }}</strong>
+    </button>
+    <div class="kpi"><span>Unidades en bodega</span><strong>{{ r.unidades }}</strong></div>
+    <div class="kpi"><span>Valor al costo</span><strong>{{ r.valor_costo | quetzales }}</strong></div>
+    <button class="kpi alerta" (click)="filtrarEstado('BAJO')">
+      <span>Bajo el mínimo</span><strong>{{ r.bajo }}</strong>
+    </button>
+    <button class="kpi peligro" (click)="filtrarEstado('AGOTADO')">
+      <span>Agotados</span><strong>{{ r.agotados }}</strong>
+    </button>
+  </div>
+}
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field grow">
+      <label>Buscar</label>
+      <input placeholder="Producto, código o categoría…" [(ngModel)]="busqueda" (keyup.enter)="cargar()" />
+    </div>
+    <div class="field">
+      <label>Estado del inventario</label>
+      <select [(ngModel)]="estado" (change)="cargar()">
+        <option value="">Todos</option>
+        <option value="NORMAL">Normal</option>
+        <option value="BAJO">Bajo</option>
+        <option value="AGOTADO">Agotado</option>
+      </select>
+    </div>
+    <button class="btn" (click)="cargar()">Buscar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th><th>Producto</th><th>Categoría</th>
+          <th class="num">Existencia</th><th class="num">Stock mínimo</th><th>Nivel</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (i of items(); track i.id) {
+          <tr>
+            <td><strong>{{ i.codigo }}</strong></td>
+            <td>{{ i.producto }}</td>
+            <td>{{ i.categoria }}</td>
+            <td class="num">{{ i.existencia }}</td>
+            <td class="num">{{ i.stock_minimo }}</td>
+            <td style="min-width: 120px">
+              <div class="nivel">
+                <div [style.width.%]="i.stock_minimo ? (i.existencia / (i.stock_minimo * 3)) * 100 : 100"
+                     [class.bajo]="i.estado_inventario !== 'NORMAL'"></div>
+              </div>
+            </td>
+            <td>
+              <span class="badge"
+                    [class.badge-ok]="i.estado_inventario === 'NORMAL'"
+                    [class.badge-warn]="i.estado_inventario === 'BAJO'"
+                    [class.badge-bad]="i.estado_inventario === 'AGOTADO'">
+                {{ i.estado_inventario }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="vacio">{{ cargando() ? 'Cargando…' : 'Sin resultados' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

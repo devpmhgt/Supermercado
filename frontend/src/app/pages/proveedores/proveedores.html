@@ -1,0 +1,105 @@
+<div class="page-header">
+  <div>
+    <h1>Proveedores</h1>
+    <p>Empresas que abastecen de productos al supermercado</p>
+  </div>
+  <button class="btn btn-primary" (click)="nuevo()">+ Nuevo proveedor</button>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field grow">
+      <label>Buscar</label>
+      <input placeholder="Nombre, NIT o contacto…" [(ngModel)]="busqueda" (keyup.enter)="cargar()" />
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="filtroEstado" (change)="cargar()">
+        <option value="">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+    </div>
+    <button class="btn" (click)="cargar()">Buscar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Proveedor</th><th>NIT</th><th>Contacto</th><th>Teléfono</th>
+          <th>Correo</th><th>Dirección</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of proveedores(); track p.id) {
+          <tr [class.inactivo]="!p.activo">
+            <td>{{ p.id }}</td>
+            <td><strong>{{ p.nombre }}</strong></td>
+            <td>{{ p.nit }}</td>
+            <td>{{ p.contacto }}</td>
+            <td>{{ p.telefono }}</td>
+            <td>{{ p.correo }}</td>
+            <td>{{ p.direccion }}</td>
+            <td>
+              <span class="badge" [class.badge-ok]="p.activo" [class.badge-gris]="!p.activo">
+                {{ p.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button class="btn btn-sm" (click)="editar(p)">Editar</button>
+              @if (p.activo) {
+                <button class="btn btn-sm btn-danger" (click)="desactivar(p)">Desactivar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="9" class="vacio">{{ cargando() ? 'Cargando…' : 'No se encontraron proveedores' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-fondo" (click)="modalAbierto.set(false)">
+    <form class="modal" [formGroup]="form" (ngSubmit)="guardar()" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar proveedor' : 'Nuevo proveedor' }}</h2>
+      <div class="form-grid">
+        <div class="field full">
+          <label>Nombre del proveedor *</label>
+          <input formControlName="nombre" />
+          @if (invalido('nombre')) { <span class="error-text">Obligatorio (mín. 2 caracteres)</span> }
+        </div>
+        <div class="field">
+          <label>NIT *</label>
+          <input formControlName="nit" placeholder="1234567-8" />
+          @if (invalido('nit')) { <span class="error-text">NIT inválido (ej. 1234567-8)</span> }
+        </div>
+        <div class="field">
+          <label>Nombre de contacto</label>
+          <input formControlName="contacto" />
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input formControlName="telefono" placeholder="22001100" />
+          @if (invalido('telefono')) { <span class="error-text">Debe tener 8 dígitos</span> }
+        </div>
+        <div class="field">
+          <label>Correo electrónico</label>
+          <input type="email" formControlName="correo" />
+          @if (invalido('correo')) { <span class="error-text">Correo inválido</span> }
+        </div>
+        <div class="field full">
+          <label>Dirección</label>
+          <input formControlName="direccion" />
+        </div>
+        <label class="check full"><input type="checkbox" formControlName="activo" /> Activo</label>
+      </div>
+      <div class="modal-acciones">
+        <button type="button" class="btn" (click)="modalAbierto.set(false)">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">Guardar</button>
+      </div>
+    </form>
+  </div>
+}

@@ -1,0 +1,79 @@
+<div class="page-header">
+  <div>
+    <h1>Ventas</h1>
+    <p>Consulta de las ventas registradas</p>
+  </div>
+  <a class="btn btn-primary" routerLink="/ventas/nueva">+ Nueva venta</a>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field">
+      <label>Desde</label>
+      <input type="date" [(ngModel)]="desde" />
+    </div>
+    <div class="field">
+      <label>Hasta</label>
+      <input type="date" [(ngModel)]="hasta" />
+    </div>
+    <div class="field grow">
+      <label>Cliente</label>
+      <select [(ngModel)]="clienteId">
+        <option value="">Todos</option>
+        @for (c of clientes(); track c.id) {
+          <option [value]="c.id">{{ c.nombres }} {{ c.apellidos }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="estado">
+        <option value="">Todos</option>
+        <option value="COMPLETADA">Completada</option>
+        <option value="ANULADA">Anulada</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" (click)="cargar()">Filtrar</button>
+    <button class="btn" (click)="limpiar()">Limpiar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th><th>Fecha</th><th>Cliente</th><th>Usuario</th>
+          <th class="num">Productos</th><th class="num">Total</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of ventas(); track v.id) {
+          <tr [class.inactivo]="v.estado === 'ANULADA'">
+            <td><strong>#{{ v.id }}</strong></td>
+            <td>{{ v.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ v.cliente }}</td>
+            <td>{{ v.usuario }}</td>
+            <td class="num">{{ v.productos }}</td>
+            <td class="num">{{ v.total | quetzales }}</td>
+            <td>
+              <span class="badge" [class.badge-ok]="v.estado === 'COMPLETADA'" [class.badge-bad]="v.estado === 'ANULADA'">
+                {{ v.estado }}
+              </span>
+            </td>
+            <td class="acciones"><a class="btn btn-sm" [routerLink]="['/ventas', v.id]">Ver detalle</a></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8" class="vacio">{{ cargando() ? 'Cargando…' : 'No hay ventas para los filtros seleccionados' }}</td></tr>
+        }
+      </tbody>
+      @if (ventas().length) {
+        <tfoot>
+          <tr>
+            <td colspan="5">{{ ventas().length }} ventas (total de completadas)</td>
+            <td class="num">{{ totalListado() | quetzales }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      }
+    </table>
+  </div>
+</div>

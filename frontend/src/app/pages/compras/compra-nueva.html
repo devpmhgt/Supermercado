@@ -1,0 +1,82 @@
+<div class="page-header">
+  <div>
+    <h1>Nueva compra</h1>
+    <p>Ingreso de mercadería de un proveedor (suma al inventario)</p>
+  </div>
+  <a class="btn" routerLink="/compras">← Volver</a>
+</div>
+
+<div class="movimiento">
+  <div class="card">
+    <div class="field" style="margin-bottom: 1rem">
+      <label>Proveedor *</label>
+      <select [ngModel]="proveedorId()" (ngModelChange)="proveedorId.set($event)">
+        <option [ngValue]="null" disabled>Seleccione un proveedor…</option>
+        @for (p of proveedores(); track p.id) {
+          <option [ngValue]="p.id">{{ p.nombre }} — NIT {{ p.nit }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field buscador">
+      <label>Agregar producto</label>
+      <input placeholder="Escribe el código o nombre del producto…"
+             [ngModel]="filtro()" (ngModelChange)="filtro.set($event)" />
+      @if (resultados().length) {
+        <ul class="resultados">
+          @for (p of resultados(); track p.id) {
+            <li (click)="agregar(p)">
+              <span><strong>{{ p.codigo }}</strong> · {{ p.nombre }}</span>
+              <span>{{ p.precio_compra | quetzales }} · <small>Exist.: {{ p.existencia }}</small></span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="table-wrap" style="margin-top: 1rem">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th><th class="num">Existencia actual</th><th class="num">Cantidad</th>
+            <th class="num">Precio compra (Q)</th><th class="num">Subtotal</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of lineas(); track l.producto.id) {
+            <tr>
+              <td>{{ l.producto.nombre }}</td>
+              <td class="num">{{ l.producto.existencia }}</td>
+              <td class="num">
+                <input type="number" min="1" [ngModel]="l.cantidad"
+                       (ngModelChange)="cambiar(l.producto.id, 'cantidad', $event)" />
+              </td>
+              <td class="num">
+                <input type="number" min="0" step="0.01" [ngModel]="l.precio_compra"
+                       (ngModelChange)="cambiar(l.producto.id, 'precio_compra', $event)" />
+              </td>
+              <td class="num">{{ l.cantidad * l.precio_compra | quetzales }}</td>
+              <td class="acciones"><button class="btn btn-sm btn-danger" (click)="quitar(l.producto.id)">✕</button></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="vacio">Aún no hay productos en la compra</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card resumen">
+    <h2>Resumen</h2>
+    <div class="fila"><span>Productos</span><strong>{{ lineas().length }}</strong></div>
+    <div class="fila total"><span>Total</span><strong>{{ total() | quetzales }}</strong></div>
+    @if (lineasInvalidas().length) {
+      <p class="error-text">Revisa cantidades (enteros ≥ 1) y precios (≥ 0).</p>
+    }
+    <button class="btn btn-primary" style="width: 100%"
+            [disabled]="guardando() || !proveedorId() || !lineas().length || lineasInvalidas().length"
+            (click)="registrar()">
+      {{ guardando() ? 'Registrando…' : 'Registrar compra' }}
+    </button>
+  </div>
+</div>

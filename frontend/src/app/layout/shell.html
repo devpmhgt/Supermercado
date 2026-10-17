@@ -1,0 +1,34 @@
+<aside class="sidebar" [class.abierto]="menuAbierto()">
+  <div class="marca">
+    <span class="logo">S</span>
+    <div>
+      <strong>SuperMercado</strong>
+      <small>Sistema de gestión</small>
+    </div>
+  </div>
+
+  <nav>
+    @for (item of menu; track item.ruta) {
+      <a [routerLink]="item.ruta" routerLinkActive="activo" (click)="menuAbierto.set(false)">
+        <span class="icono">{{ item.icono }}</span>{{ item.texto }}
+      </a>
+    }
+  </nav>
+
+  <div class="usuario">
+    <div>
+      <strong>{{ auth.usuario()?.nombre }}</strong>
+      <small>{{ auth.usuario()?.username }} · {{ auth.usuario()?.rol }}</small>
+    </div>
+    <button class="btn btn-sm salir" (click)="auth.logout()">Cerrar sesión</button>
+  </div>
+</aside>
+
+<header class="topbar no-print">
+  <button class="btn btn-sm" (click)="menuAbierto.set(!menuAbierto())">☰ Menú</button>
+  <strong>SuperMercado</strong>
+</header>
+
+<main class="contenido">
+  <router-outlet />
+</main>

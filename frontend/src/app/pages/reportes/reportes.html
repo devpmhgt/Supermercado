@@ -1,0 +1,72 @@
+<div class="page-header">
+  <div>
+    <h1>Reportes</h1>
+    <p>Información obtenida mediante consultas a la base de datos</p>
+  </div>
+  <div class="no-print" style="display: flex; gap: .5rem">
+    <button class="btn" (click)="exportarCSV()" [disabled]="!filas().length">Exportar CSV</button>
+    <button class="btn" (click)="imprimir()">Imprimir</button>
+  </div>
+</div>
+
+<div class="pestanas no-print">
+  @for (r of reportes; track r.id) {
+    <button [class.activa]="r.id === actual().id" (click)="seleccionar(r)">{{ r.titulo }}</button>
+  }
+</div>
+
+<div class="card">
+  <h2>{{ actual().titulo }}</h2>
+  <p class="descripcion">{{ actual().descripcion }}</p>
+
+  @if (actual().id === 'ventas-fecha') {
+    <div class="toolbar no-print">
+      <div class="field">
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="desde" />
+      </div>
+      <div class="field">
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="hasta" />
+      </div>
+      <button class="btn btn-primary" (click)="ejecutar()">Generar</button>
+    </div>
+    @if (resumenFechas(); as r) {
+      <div class="resumen-fechas">
+        <div><span>Ventas completadas</span><strong>{{ r.cantidad }}</strong></div>
+        <div><span>Total</span><strong>{{ r.total | quetzales }}</strong></div>
+        <div><span>Promedio</span><strong>{{ r.promedio | quetzales }}</strong></div>
+        <div><span>Mínima</span><strong>{{ r.minima | quetzales }}</strong></div>
+        <div><span>Máxima</span><strong>{{ r.maxima | quetzales }}</strong></div>
+      </div>
+    }
+  }
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          @for (c of actual().columnas; track c.campo) {
+            <th [class.num]="c.tipo === 'numero' || c.tipo === 'moneda'">{{ c.titulo }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track $index) {
+          <tr>
+            @for (c of actual().columnas; track c.campo) {
+              @switch (c.tipo) {
+                @case ('moneda') { <td class="num">{{ f[c.campo] | quetzales }}</td> }
+                @case ('numero') { <td class="num">{{ f[c.campo] }}</td> }
+                @case ('fecha') { <td>{{ f[c.campo] | date: 'dd/MM/yyyy HH:mm' }}</td> }
+                @default { <td>{{ f[c.campo] }}</td> }
+              }
+            }
+          </tr>
+        } @empty {
+          <tr><td [attr.colspan]="actual().columnas.length" class="vacio">{{ cargando() ? 'Generando reporte…' : 'Sin datos para este reporte' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

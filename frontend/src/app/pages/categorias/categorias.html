@@ -1,0 +1,92 @@
+<div class="page-header">
+  <div>
+    <h1>Categorías</h1>
+    <p>Clasificación de los productos del supermercado</p>
+  </div>
+  <button class="btn btn-primary" (click)="nueva()">+ Nueva categoría</button>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field grow">
+      <label>Buscar</label>
+      <input placeholder="Código o nombre…" [(ngModel)]="busqueda" (keyup.enter)="cargar()" />
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="filtroEstado" (change)="cargar()">
+        <option value="">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+    </div>
+    <button class="btn" (click)="cargar()">Buscar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th><th>Nombre</th><th>Descripción</th>
+          <th class="num">Productos</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of categorias(); track c.id) {
+          <tr [class.inactivo]="!c.activo">
+            <td><strong>{{ c.codigo }}</strong></td>
+            <td>{{ c.nombre }}</td>
+            <td>{{ c.descripcion }}</td>
+            <td class="num">{{ c.total_productos }}</td>
+            <td>
+              <span class="badge" [class.badge-ok]="c.activo" [class.badge-gris]="!c.activo">
+                {{ c.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button class="btn btn-sm" (click)="editar(c)">Editar</button>
+              @if (c.activo) {
+                <button class="btn btn-sm btn-danger" (click)="desactivar(c)">Desactivar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="vacio">{{ cargando() ? 'Cargando…' : 'No hay categorías' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-fondo" (click)="modalAbierto.set(false)">
+    <form class="modal" [formGroup]="form" (ngSubmit)="guardar()" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar categoría' : 'Nueva categoría' }}</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Código *</label>
+          <input formControlName="codigo" placeholder="BEB" />
+          @if (form.controls.codigo.touched && form.controls.codigo.invalid) {
+            <span class="error-text">Obligatorio (máx. 10 caracteres)</span>
+          }
+        </div>
+        <div class="field">
+          <label>Nombre *</label>
+          <input formControlName="nombre" placeholder="Bebidas" />
+          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+            <span class="error-text">Obligatorio (2 a 60 caracteres)</span>
+          }
+        </div>
+        <div class="field full">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion" rows="2"></textarea>
+        </div>
+        <label class="check full"><input type="checkbox" formControlName="activo" /> Activa</label>
+      </div>
+      <div class="modal-acciones">
+        <button type="button" class="btn" (click)="modalAbierto.set(false)">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">Guardar</button>
+      </div>
+    </form>
+  </div>
+}

@@ -1,0 +1,144 @@
+<div class="page-header">
+  <div>
+    <h1>Productos</h1>
+    <p>Registro, consulta y búsqueda de productos</p>
+  </div>
+  <button class="btn btn-primary" (click)="nuevo()">+ Nuevo producto</button>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="field grow">
+      <label>Buscar</label>
+      <input placeholder="Código, nombre o descripción…" [(ngModel)]="busqueda" (keyup.enter)="cargar()" />
+    </div>
+    <div class="field">
+      <label>Categoría</label>
+      <select [(ngModel)]="filtroCategoria" (change)="cargar()">
+        <option value="">Todas</option>
+        @for (c of categorias(); track c.id) {
+          <option [value]="c.id">{{ c.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select [(ngModel)]="filtroEstado" (change)="cargar()">
+        <option value="">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+    </div>
+    <button class="btn" (click)="cargar()">Buscar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th><th>Nombre</th><th>Categoría</th>
+          <th class="num">P. compra</th><th class="num">P. venta</th>
+          <th class="num">Existencia</th><th class="num">Mínimo</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of productos(); track p.id) {
+          <tr [class.inactivo]="!p.activo">
+            <td><strong>{{ p.codigo }}</strong></td>
+            <td>
+              {{ p.nombre }}
+              @if (p.descripcion) { <br /><small style="color: var(--gris)">{{ p.descripcion }}</small> }
+            </td>
+            <td>{{ p.categoria }}</td>
+            <td class="num">{{ p.precio_compra | quetzales }}</td>
+            <td class="num">{{ p.precio_venta | quetzales }}</td>
+            <td class="num">
+              <span class="badge"
+                    [class.badge-bad]="p.existencia === 0"
+                    [class.badge-warn]="p.existencia > 0 && p.existencia < p.stock_minimo"
+                    [class.badge-ok]="p.existencia >= p.stock_minimo">
+                {{ p.existencia }}
+              </span>
+            </td>
+            <td class="num">{{ p.stock_minimo }}</td>
+            <td>
+              <span class="badge" [class.badge-ok]="p.activo" [class.badge-gris]="!p.activo">
+                {{ p.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button class="btn btn-sm" (click)="editar(p)">Editar</button>
+              @if (p.activo) {
+                <button class="btn btn-sm btn-danger" (click)="desactivar(p)">Desactivar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="9" class="vacio">{{ cargando() ? 'Cargando…' : 'No se encontraron productos' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (modalAbierto()) {
+  <div class="modal-fondo" (click)="modalAbierto.set(false)">
+    <form class="modal" [formGroup]="form" (ngSubmit)="guardar()" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Código *</label>
+          <input formControlName="codigo" placeholder="BEB-001" />
+          @if (invalido('codigo')) { <span class="error-text">Obligatorio (máx. 20)</span> }
+        </div>
+        <div class="field">
+          <label>Categoría *</label>
+          <select formControlName="categoria_id">
+            <option [ngValue]="0" disabled>Seleccione…</option>
+            @for (c of categorias(); track c.id) {
+              <option [ngValue]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+          @if (invalido('categoria_id')) { <span class="error-text">Seleccione una categoría</span> }
+        </div>
+        <div class="field full">
+          <label>Nombre *</label>
+          <input formControlName="nombre" />
+          @if (invalido('nombre')) { <span class="error-text">Obligatorio (2 a 100 caracteres)</span> }
+        </div>
+        <div class="field full">
+          <label>Descripción</label>
+          <input formControlName="descripcion" />
+        </div>
+        <div class="field">
+          <label>Precio de compra (Q) *</label>
+          <input type="number" step="0.01" min="0" formControlName="precio_compra" />
+          @if (invalido('precio_compra')) { <span class="error-text">Debe ser 0 o mayor</span> }
+        </div>
+        <div class="field">
+          <label>Precio de venta (Q) *</label>
+          <input type="number" step="0.01" min="0" formControlName="precio_venta" />
+          @if (invalido('precio_venta')) { <span class="error-text">Debe ser 0 o mayor</span> }
+        </div>
+        <div class="field">
+          <label>Existencia {{ editandoId() ? '(se actualiza con compras/ventas)' : 'inicial' }}</label>
+          <input type="number" min="0" formControlName="existencia" />
+          @if (invalido('existencia')) { <span class="error-text">Debe ser 0 o mayor</span> }
+        </div>
+        <div class="field">
+          <label>Stock mínimo *</label>
+          <input type="number" min="0" formControlName="stock_minimo" />
+          @if (invalido('stock_minimo')) { <span class="error-text">Debe ser 0 o mayor</span> }
+        </div>
+        @if (form.errors?.['precios'] && (form.controls.precio_venta.touched || form.controls.precio_compra.touched)) {
+          <span class="error-text full">El precio de venta no puede ser menor que el precio de compra</span>
+        }
+        <label class="check full"><input type="checkbox" formControlName="activo" /> Activo</label>
+      </div>
+      <div class="modal-acciones">
+        <button type="button" class="btn" (click)="modalAbierto.set(false)">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">Guardar</button>
+      </div>
+    </form>
+  </div>
+}

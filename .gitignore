@@ -1,0 +1,26 @@
+node_modules/
+dist/
+.angular/
+.venv/
+__pycache__/
+.env
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
