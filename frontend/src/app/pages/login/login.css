@@ -14,3 +14,8 @@
 .sub { margin: -0.6rem 0 .25rem; color: var(--gris); }
 .alerta { background: var(--rojo-claro); color: var(--rojo); padding: .65rem .8rem; border-radius: 8px; }
 .btn { padding: .7rem; }
+.lab-badge {
+  align-self: center; padding: .35rem .9rem; border-radius: 999px;
+  background: #eef4ff; color: var(--navy); border: 1px solid var(--azul);
+  font-size: .8rem; font-weight: 600;
+}

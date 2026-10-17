@@ -1,7 +1,7 @@
 <div class="pantalla">
   <form class="caja" [formGroup]="form" (ngSubmit)="ingresar()">
     <div class="logo">S</div>
-    <h1>SuperMercado</h1>
+    <h1>SuperMercado – v1.1</h1>
     <p class="sub">Ingresa con tu usuario para continuar</p>
 
     <div class="field">
@@ -27,5 +27,7 @@
     <button class="btn btn-primary" type="submit" [disabled]="cargando()">
       {{ cargando() ? 'Verificando…' : 'Iniciar sesión' }}
     </button>
+
+    <div class="lab-badge">Laboratorio Git – Pablo Martinez</div>
   </form>
 </div>
